@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>恋するペンギン診断（恋ペン）🐧 あなたはどのペンギン？</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<meta property="og:title" content="恋するペンギン診断 🐧 あなたはどのペンギン？">
+<meta property="og:description" content="28の質問でわかる、あなたの恋愛タイプ。16種類のペンギンから、あなたにそっくりな一匹を診断します。">
+<meta property="og:type" content="website">
+<style>
+  :root{
+    --pink:#ff8fb0; --pink-d:#e0668c; --pink-soft:#ffdfe9; --pink-bg:#fff4f8;
+    --cream:#fcf6ee; --ink:#5b525c; --ink-soft:#9b909c; --line:#f1e4ea;
+    --blue:#9aa8ef; --green:#74b58f; --amber:#e7b75a; --card:#ffffff;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{font-family:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans",-apple-system,sans-serif;
+    color:var(--ink);background:linear-gradient(180deg,#fff3f6 0%,#f3eefb 45%,#eafaf4 100%);
+    background-attachment:fixed;min-height:100vh;line-height:1.8;}
+  .wrap{max-width:600px;margin:0 auto;padding:0 16px 70px;}
+  .screen{display:none;animation:fade .35s ease;}
+  .screen.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  @keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+  .peng-float{animation:bob 2.8s ease-in-out infinite;}
+  /* top bar */
+  .topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.82);backdrop-filter:blur(8px);
+    margin:0 -16px 0;padding:10px 16px;display:flex;gap:14px;align-items:center;overflow-x:auto;border-bottom:1px solid var(--line);}
+  .topbar a{color:var(--ink-soft);font-size:13px;font-weight:700;text-decoration:none;white-space:nowrap;}
+  .topbar a.brand{color:var(--pink-d);font-family:"Mochiy Pop One",sans-serif;}
+  .topbar a.lang{margin-left:auto;border:1.5px solid var(--pink-soft);border-radius:999px;padding:3px 12px;color:var(--pink-d);}
+  h1{font-size:25px;font-weight:400;margin:0;text-align:center;letter-spacing:.5px;font-family:"Mochiy Pop One","Zen Maru Gothic",sans-serif;}
+  h2.sec{font-size:19px;font-weight:400;margin:34px 0 14px;text-align:center;color:var(--pink-d);scroll-margin-top:64px;font-family:"Mochiy Pop One","Zen Maru Gothic",sans-serif;}
+  h2.sec small{display:block;font-size:11px;letter-spacing:3px;color:var(--ink-soft);font-weight:700;}
+  .sub{text-align:center;color:var(--ink-soft);font-size:14px;margin:6px 0 0;}
+  .card{background:var(--card);border-radius:26px;padding:26px 22px;box-shadow:0 12px 34px rgba(190,150,170,.16);}
+  .btn{display:block;width:100%;border:none;cursor:pointer;background:var(--pink);color:#fff;font-weight:700;font-size:17px;
+    padding:16px;border-radius:999px;font-family:inherit;box-shadow:0 8px 18px rgba(255,143,176,.45);transition:transform .12s;}
+  .btn:active{transform:scale(.97);}
+  .btn.ghost{background:#fff;color:var(--pink-d);border:2px solid var(--pink-soft);box-shadow:none;}
+  .badge{display:inline-block;background:var(--pink-soft);color:var(--pink-d);font-size:12px;font-weight:700;padding:5px 14px;border-radius:999px;}
+  /* hero */
+  .hero{text-align:center;padding-top:18px;}
+  .info3{display:flex;justify-content:center;gap:16px;margin:18px 0;}
+  .info3 .b{background:#fff;border-radius:16px;padding:10px 16px;box-shadow:0 6px 16px rgba(190,150,170,.12);font-size:12px;color:var(--ink-soft);}
+  .info3 .b b{display:block;color:var(--ink);font-size:20px;font-weight:700;}
+  /* info boxes */
+  .ibox{border-radius:18px;padding:14px 18px;margin:12px 0;font-size:14px;}
+  .ibox .h{font-weight:700;font-size:13px;margin-bottom:3px;}
+  .ibox.amber{background:#fdf3df;} .ibox.amber .h{color:#b9852a;}
+  .ibox.pink{background:var(--pink-bg);} .ibox.pink .h{color:var(--pink-d);}
+  .ibox.blue{background:#eef0fd;} .ibox.blue .h{color:#5a68c4;}
+  .lead{font-size:15px;margin:0 2px;}
+  /* axis cards */
+  .axinfo{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .axinfo .a{background:#fff;border-radius:16px;padding:13px 14px;box-shadow:0 6px 16px rgba(190,150,170,.1);}
+  .axinfo .a .t{font-weight:700;font-size:13px;color:var(--pink-d);}
+  .axinfo .a .p{font-size:13px;margin-top:3px;}
+  .axinfo .a .p b{color:var(--ink);}
+  /* type grid */
+  .tgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+  .tcard{background:#fff;border-radius:20px;padding:14px 10px 16px;text-align:center;box-shadow:0 8px 20px rgba(190,150,170,.12);
+    display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:transform .12s;}
+  .tcard:active{transform:scale(.97);}
+  .tcard .pc{width:84px;height:84px;border-radius:50%;background:#faf5f0;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .tcard .pc img,.tcard .pc svg{width:74px;height:auto;display:block;}
+  .tcard .nm{font-size:14px;font-weight:700;margin-top:6px;}
+  .tcard .cd{font-size:10.5px;letter-spacing:1.5px;color:var(--ink-soft);}
+  .tcard .ct{font-size:11px;color:var(--ink-soft);line-height:1.5;}
+  /* compat preview table */
+  .ctab{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 8px 20px rgba(190,150,170,.1);}
+  .ctab th,.ctab td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:left;}
+  .ctab th{background:var(--pink-bg);color:var(--pink-d);font-size:12px;}
+  .ctab tr:last-child td{border-bottom:none;}
+  .ctab .c-name{font-weight:700;}
+  /* quiz */
+  .progress-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--ink-soft);margin:18px 0 8px;}
+  .progress-row b{color:var(--pink-d);font-weight:700;}
+  .bar{height:10px;background:#fff;border-radius:999px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--line);}
+  .bar>i{display:block;height:100%;background:linear-gradient(90deg,#ffc4d6,#ff8fb0);border-radius:999px;transition:width .3s;}
+  .q-text{font-size:19px;font-weight:700;text-align:center;margin:24px 8px 22px;min-height:56px;}
+  .choice{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#fff;border:2px solid var(--line);border-radius:18px;
+    padding:16px;margin-bottom:13px;cursor:pointer;font-family:inherit;font-size:15px;color:var(--ink);transition:transform .12s,border-color .12s;}
+  .choice:hover{border-color:var(--pink-soft);} .choice:active{transform:scale(.98);}
+  .choice .ic{flex:none;width:34px;height:34px;border-radius:50%;background:var(--pink-bg);display:flex;align-items:center;justify-content:center;font-size:18px;}
+  .q-back{display:block;margin:6px auto 0;background:none;border:none;color:var(--ink-soft);font-size:13px;cursor:pointer;font-family:inherit;text-decoration:underline;}
+  /* result */
+  .res-top{text-align:center;}
+  .res-peng img,.res-peng svg{width:170px;height:auto;}
+  .res-name{font-size:27px;font-weight:700;margin:8px 0 2px;}
+  .res-species{color:var(--pink-d);font-weight:700;font-size:13px;}
+  .code-badge{display:inline-block;margin:12px 0 4px;font-weight:700;font-size:22px;letter-spacing:6px;color:#6a6276;
+    background:#f4f0fb;border:1.5px solid #e6e0f1;border-radius:12px;padding:6px 8px 6px 14px;}
+  .code-expand{color:var(--ink-soft);font-size:12px;margin:0;}
+  .res-cat{font-size:14px;margin:12px 0 0;line-height:1.7;}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:14px 0;}
+  .tag{background:var(--pink-bg);color:var(--pink-d);font-size:12px;font-weight:700;padding:6px 13px;border-radius:999px;}
+  h3.rh{font-size:15px;font-weight:700;margin:26px 0 10px;padding-left:11px;border-left:4px solid var(--pink);}
+  .res-desc{font-size:15px;margin:0;}
+  .gw{display:flex;flex-direction:column;gap:10px;margin-top:14px;}
+  .gw-box{border-radius:14px;padding:12px 14px;font-size:14px;}
+  .gw-box .gw-h{display:block;font-weight:700;font-size:12px;margin-bottom:3px;}
+  .gw-box.good{background:var(--pink-bg);} .gw-box.good .gw-h{color:var(--pink-d);}
+  .gw-box.weak{background:#eef6f1;} .gw-box.weak .gw-h{color:var(--green);}
+  .axis{margin:16px 0;}
+  .ax-row{display:flex;align-items:center;gap:10px;}
+  .ax-pole{flex:none;width:62px;font-size:13px;color:var(--ink-soft);font-weight:700;text-align:center;line-height:1.3;}
+  .ax-pole small{display:block;font-size:10px;opacity:.7;}
+  .ax-pole.on{color:var(--blue);}
+  .ax-bar{flex:1;height:10px;background:#eef0fa;border-radius:999px;overflow:hidden;box-shadow:inset 0 0 0 1px #e6e9f6;}
+  .ax-bar>i{display:block;height:100%;background:linear-gradient(90deg,#c2ccff,#9aa8ef);}
+  .ax-cap{font-size:12px;color:var(--ink-soft);text-align:center;margin:5px 0 0;}
+  .ax-cap b{color:var(--ink);}
+  .match{display:flex;gap:13px;border-radius:18px;padding:14px 16px;margin:12px 0;align-items:flex-start;}
+  .match.best{background:var(--pink-bg);} .match.tough{background:#eef2fb;}
+  .match .mp{flex:none;width:62px;height:62px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .match .mp img,.match .mp svg{width:58px;height:auto;}
+  .m-tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;margin-bottom:3px;}
+  .m-tag.good{background:var(--pink-soft);color:var(--pink-d);} .m-tag.bad{background:#dde2f5;color:#4f5da0;}
+  .m-name{font-size:16px;font-weight:700;} .m-sp{color:var(--ink-soft);font-size:11px;margin-left:6px;}
+  .m-reason{font-size:13px;margin:5px 0 0;}
+  .advice{background:#fdf3df;border-radius:16px;padding:14px 16px;font-size:14px;margin-top:18px;}
+  .advice b{color:#b9852a;}
+  /* share */
+  .share-row{display:flex;gap:10px;margin-top:18px;}
+  .sbtn{flex:1;border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:14px;color:#fff;padding:13px;border-radius:14px;display:flex;align-items:center;justify-content:center;gap:7px;}
+  .sbtn.x{background:#111;} .sbtn.line{background:#06c755;} .sbtn.copy{background:#fff;color:var(--ink);border:2px solid var(--line);}
+  .res-btns{display:flex;flex-direction:column;gap:10px;margin-top:14px;}
+  .foot{text-align:center;color:var(--ink-soft);font-size:11px;margin-top:26px;padding-bottom:10px;}
+  .toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:50;}
+  .toast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="peng" viewBox="0 0 120 130">
+  <clipPath id="pbody"><ellipse cx="60" cy="66" rx="40" ry="46"/></clipPath>
+  <ellipse cx="60" cy="124" rx="30" ry="5" fill="#000000" opacity="0.08"/>
+  <ellipse cx="50" cy="118" rx="7" ry="3.5" fill="#ef9a3d"/><ellipse cx="70" cy="118" rx="7" ry="3.5" fill="#ef9a3d"/>
+  <g style="fill:var(--down)">
+    <circle cx="60" cy="18" r="8"/><circle cx="52" cy="17" r="5"/><circle cx="68" cy="17" r="5"/>
+    <circle cx="46" cy="22" r="6.5"/><circle cx="74" cy="22" r="6.5"/>
+    <circle cx="33" cy="33" r="7"/><circle cx="87" cy="33" r="7"/>
+    <circle cx="24" cy="49" r="6.5"/><circle cx="96" cy="49" r="6.5"/>
+    <circle cx="20" cy="66" r="6.5"/><circle cx="100" cy="66" r="6.5"/>
+    <circle cx="23" cy="83" r="6.5"/><circle cx="97" cy="83" r="6.5"/>
+    <circle cx="31" cy="98" r="7"/><circle cx="89" cy="98" r="7"/>
+    <circle cx="44" cy="108" r="7"/><circle cx="76" cy="108" r="7"/><circle cx="60" cy="111" r="7"/>
+    <ellipse cx="60" cy="66" rx="40" ry="46"/>
+  </g>
+  <g clip-path="url(#pbody)"><ellipse cx="88" cy="64" rx="42" ry="48" fill="#000000" opacity="0.07"/></g>
+  <ellipse cx="44" cy="34" rx="12" ry="8" fill="#ffffff" opacity="0.16"/>
+  <ellipse cx="60" cy="90" rx="25" ry="24" fill="#ffffff"/>
+  <ellipse cx="48" cy="49" rx="14" ry="15.5" fill="#ffffff"/><ellipse cx="72" cy="49" rx="14" ry="15.5" fill="#ffffff"/>
+  <ellipse cx="40" cy="58" rx="5.5" ry="3.6" fill="#ffb3c6"/><ellipse cx="80" cy="58" rx="5.5" ry="3.6" fill="#ffb3c6"/>
+  <ellipse cx="49" cy="51" rx="5" ry="6" fill="#20202a"/><ellipse cx="71" cy="51" rx="5" ry="6" fill="#20202a"/>
+  <circle cx="46.8" cy="48" r="2.3" fill="#ffffff"/><circle cx="68.8" cy="48" r="2.3" fill="#ffffff"/>
+  <circle cx="51" cy="54" r="0.9" fill="#ffffff"/><circle cx="73" cy="54" r="0.9" fill="#ffffff"/>
+  <path d="M55 58 Q60 56.5 65 58 Q62.5 63 60 63.5 Q57.5 63 55 58 Z" fill="#5e5965"/>
+  <path d="M60 58 L60 63.5" stroke="#403c47" stroke-width="0.6" stroke-opacity="0.6"/>
+  <ellipse cx="57" cy="59" rx="1.6" ry="0.9" fill="#9a96a3" opacity="0.8"/>
+  <path d="M56 65 Q59 67.5 60 65.8 Q61 67.5 64 65" stroke="#403c47" stroke-width="1" fill="none" stroke-linecap="round" stroke-opacity="0.6"/>
+</symbol>
+</defs></svg>
+
+<div class="topbar">
+  <a href="javascript:void(0)" class="brand" onclick="goSection('top')">🐧 恋ペン</a>
+  <a href="javascript:void(0)" onclick="goSection('types')">16タイプ</a>
+  <a href="javascript:void(0)" onclick="goSection('compat')">相性</a>
+  <a href="javascript:void(0)" onclick="goSection('about')">診断とは</a>
+  <a href="en/index.html" class="lang">English</a>
+</div>
+
+<div class="wrap" id="top">
+
+  <!-- LANDING -->
+  <section id="screen-start" class="screen active">
+    <div class="hero">
+      <div style="margin:14px 0 2px;" class="peng-float" id="hero-peng"></div>
+      <span class="badge">南極の恋愛診断 ・ 通称「恋ペン」</span>
+      <h1 style="margin-top:10px;">あなたはどのペンギン？</h1>
+      <p class="sub">28の質問でじっくり分析する、あなたの恋愛タイプ。<br>16種類のペンギンから、あなたにそっくりな一匹を見つけます。</p>
+      <div class="info3">
+        <div class="b"><b>28</b>問の質問</div>
+        <div class="b"><b>16</b>タイプ</div>
+        <div class="b"><b>約3</b>分</div>
+      </div>
+      <button class="btn" onclick="startQuiz()">しんだんスタート 🐧</button>
+    </div>
+
+    <h2 class="sec" id="about">恋するペンギン診断とは？<small>ABOUT</small></h2>
+    <p class="lead">「恋するペンギン診断」は、28の質問に答えるだけで、あなたの恋愛のクセや魅力を<b>16種類のかわいいペンギン</b>にたとえて教えてくれる無料の性格診断です。アプローチの仕方・気持ちの伝え方・恋に求めるもの・距離感——この4つの軸の組み合わせで、あなたにそっくりな一匹が見つかります。</p>
+    <div class="ibox amber"><span class="h">⏱ 所要時間</span>全28問、目安は2〜3分。直感でサクッと答えられます。</div>
+    <div class="ibox pink"><span class="h">🎁 結果でわかること</span>あなたのペンギンタイプ／恋の傾向・強み・のびしろ／4軸の分析グラフ／相性◎＆相性△の相手／ワンポイントアドバイス。結果はX・LINEでシェアできます。</div>
+
+    <h2 class="sec">診断の仕組み・4つの軸<small>4 AXES</small></h2>
+    <p class="lead" style="text-align:center;">あなたの回答を4つの軸でスコア化し、各軸の傾向を組み合わせて <b>16タイプ（2⁴）</b> に分類します。</p>
+    <div class="axinfo" style="margin-top:14px;">
+      <div class="a"><div class="t">① アプローチ</div><div class="p"><b>攻め(H)</b> ⇔ <b>待ち(W)</b><br>自分から動くか、待つか</div></div>
+      <div class="a"><div class="t">② 気持ち</div><div class="p"><b>素直(S)</b> ⇔ <b>秘め(M)</b><br>好意を出すか、隠すか</div></div>
+      <div class="a"><div class="t">③ 恋に求める</div><div class="p"><b>ときめき(D)</b> ⇔ <b>安心(R)</b><br>刺激か、安定か</div></div>
+      <div class="a"><div class="t">④ 距離感</div><div class="p"><b>密着(T)</b> ⇔ <b>自立(I)</b><br>一緒か、自分の時間も</div></div>
+    </div>
+
+    <h2 class="sec" id="types">16タイプ一覧<small>16 TYPES</small></h2>
+    <p class="lead" style="text-align:center;">気になるペンギンをタップすると、そのタイプの詳しい解説が見られます。</p>
+    <div class="tgrid" id="type-grid" style="margin-top:14px;"></div>
+
+    <h2 class="sec" id="compat">相性について<small>COMPATIBILITY</small></h2>
+    <p class="lead">恋の相性は「軸の組み合わせ」で決まります。基本は、<b>攻め×待ち</b>のように動き方が補い合うペアが好相性。逆に<b>お互い待ち＆秘め同士</b>だと、想いはあるのに進みにくい“じっくり型”になりがち。各タイプの結果ページでは、<b>相性◎ベストパートナー</b>と<b>相性△じっくり型</b>を理由つきで紹介します。</p>
+    <table class="ctab" style="margin-top:12px;"><thead><tr><th>あなた</th><th>相性◎</th></tr></thead><tbody id="compat-tbody"></tbody></table>
+
+    <h2 class="sec">MBTI診断との違い<small>vs MBTI</small></h2>
+    <p class="lead">MBTIが「考え方・行動の全体傾向」を測るのに対し、この診断は<b>“恋愛”にしぼって</b>4つの軸を見ます。コードもMBTI風の4文字（例：HSDT）で表示しますが、文字の意味は恋愛専用（H=攻め など）。気軽な恋の自己分析として、占い感覚で楽しんでください。</p>
+
+    <div style="margin-top:28px;"><button class="btn" onclick="startQuiz()">さっそく診断する 🐧</button></div>
+    <p class="foot">© 恋するペンギン診断（プロトタイプ）&nbsp;|&nbsp;<a href="en/index.html" style="color:var(--pink-d)">English version</a></p>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="screen-quiz" class="screen">
+    <div class="progress-row"><span>Q<b id="q-num">1</b> <span style="opacity:.6">/ 28</span></span><span id="q-axis"></span></div>
+    <div class="bar"><i id="q-fill" style="width:3%"></i></div>
+    <div class="card" style="margin-top:16px;"><div class="q-text" id="q-text"></div><div id="q-choices"></div></div>
+    <button class="q-back" id="q-back" onclick="prevQuestion()">← ひとつ前にもどる</button>
+  </section>
+
+  <!-- RESULT -->
+  <section id="screen-result" class="screen">
+    <div class="card">
+      <div class="res-top">
+        <span class="badge">診断結果</span>
+        <div class="res-peng peng-float" id="r-peng" style="margin:14px 0 2px;"></div>
+        <div class="res-name" id="r-name"></div>
+        <div class="res-species" id="r-species"></div>
+        <div class="code-badge" id="r-code"></div>
+        <p class="code-expand" id="r-code-expand"></p>
+        <p class="res-cat" id="r-cat"></p>
+      </div>
+      <div class="tags" id="r-tags"></div>
+      <h3 class="rh">あなたの恋の傾向</h3>
+      <p class="res-desc" id="r-desc"></p>
+      <div class="gw">
+        <div class="gw-box good"><span class="gw-h">あなたの強み</span><span id="r-good"></span></div>
+        <div class="gw-box weak"><span class="gw-h">のびしろ</span><span id="r-weak"></span></div>
+      </div>
+      <h3 class="rh">4つの軸で分析</h3>
+      <div id="r-axes"></div>
+      <h3 class="rh">相性</h3>
+      <div class="match best"><div class="mp" id="r-best-peng"></div><div>
+        <span class="m-tag good">相性◎ ベストパートナー</span>
+        <div><span class="m-name" id="r-best-name"></span><span class="m-sp" id="r-best-sp"></span></div>
+        <p class="m-reason" id="r-best-reason"></p></div></div>
+      <div class="match tough"><div class="mp" id="r-tough-peng"></div><div>
+        <span class="m-tag bad">相性△ じっくり型</span>
+        <div><span class="m-name" id="r-tough-name"></span><span class="m-sp" id="r-tough-sp"></span></div>
+        <p class="m-reason" id="r-tough-reason"></p></div></div>
+      <div class="advice"><b>恋のワンポイント：</b><span id="r-advice"></span></div>
+      <h3 class="rh">結果をシェア</h3>
+      <div class="share-row">
+        <button class="sbtn x" onclick="shareX()">𝕏 でシェア</button>
+        <button class="sbtn line" onclick="shareLine()">LINE</button>
+        <button class="sbtn copy" onclick="copyLink()">リンクをコピー</button>
+      </div>
+      <div class="res-btns"><button class="btn ghost" onclick="restart()">もう一度診断する</button></div>
+    </div>
+    <p class="foot">© 恋するペンギン診断（プロトタイプ）</p>
+  </section>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ====== ホスティング後はここを本番URLに ====== */
+const SITE_URL = (location.protocol.indexOf('http')===0) ? location.href.split('#')[0].split('?')[0] : 'https://example.com/penguin-quiz/';
+
+const AXES={a1:{name:"アプローチ",L:"H",R:"W",Ltxt:"攻め",Rtxt:"待ち"},a2:{name:"気持ち",L:"S",R:"M",Ltxt:"素直",Rtxt:"秘め"},
+  a3:{name:"恋に求める",L:"D",R:"R",Ltxt:"ときめき",Rtxt:"安心"},a4:{name:"距離感",L:"T",R:"I",Ltxt:"密着",Rtxt:"自立"}};
+const KEYTXT={H:"攻め",W:"待ち",S:"素直",M:"秘め",D:"ときめき",R:"安心",T:"密着",I:"自立"};
+const PER_AXIS=7;
+
+const QUESTIONS=[
+  {ax:"a1",t:"気になる人ができたら…？",a:{txt:"自分から話しかけにいく",ic:"🔥",k:"H"},b:{txt:"相手が動くのをじっくり待つ",ic:"❄️",k:"W"}},
+  {ax:"a1",t:"好きな人とのLINEは？",a:{txt:"自分から送ることが多い",ic:"🔥",k:"H"},b:{txt:"つい返信待ちになりがち",ic:"❄️",k:"W"}},
+  {ax:"a1",t:"デートに行くなら？",a:{txt:"「ここ行こう！」と自分から誘う",ic:"🔥",k:"H"},b:{txt:"誘われる方が落ち着く",ic:"❄️",k:"W"}},
+  {ax:"a1",t:"恋の進め方は？",a:{txt:"押して押して距離を詰める",ic:"🔥",k:"H"},b:{txt:"焦らずゆっくり育てたい",ic:"❄️",k:"W"}},
+  {ax:"a1",t:"ドキッとする場面では？",a:{txt:"思い切って行動しちゃう",ic:"🔥",k:"H"},b:{txt:"様子を見て慎重に動く",ic:"❄️",k:"W"}},
+  {ax:"a1",t:"友達以上になりたいと思ったら？",a:{txt:"きっかけを自分から作る",ic:"🔥",k:"H"},b:{txt:"自然に近づくのを待つ",ic:"❄️",k:"W"}},
+  {ax:"a1",t:"グループに気になる人がいたら？",a:{txt:"隣の席をキープしにいく",ic:"🔥",k:"H"},b:{txt:"さりげなく視界に入る位置で待つ",ic:"❄️",k:"W"}},
+  {ax:"a2",t:"好きな気持ちは？",a:{txt:"素直に態度や言葉で出す",ic:"💛",k:"S"},b:{txt:"あまり表には出さない",ic:"🌙",k:"M"}},
+  {ax:"a2",t:"好きな人へのメッセージは？",a:{txt:"絵文字もハートも気持ちものせる",ic:"💛",k:"S"},b:{txt:"素っ気なく見えるくらい控えめ",ic:"🌙",k:"M"}},
+  {ax:"a2",t:"褒められたら？",a:{txt:"嬉しさが顔に出ちゃう",ic:"💛",k:"S"},b:{txt:"平静を装っちゃう",ic:"🌙",k:"M"}},
+  {ax:"a2",t:"恋バナでは？",a:{txt:"自分の恋を割と話す",ic:"💛",k:"S"},b:{txt:"あまり明かさない",ic:"🌙",k:"M"}},
+  {ax:"a2",t:"人からよく言われるのは？",a:{txt:"「わかりやすいね」",ic:"💛",k:"S"},b:{txt:"「何考えてるか読めない」",ic:"🌙",k:"M"}},
+  {ax:"a2",t:"嫉妬したとき？",a:{txt:"態度や言葉に出ちゃう",ic:"💛",k:"S"},b:{txt:"表に出さず飲み込む",ic:"🌙",k:"M"}},
+  {ax:"a2",t:"初デートの帰り際は？",a:{txt:"「楽しかった！また会いたい」と伝える",ic:"💛",k:"S"},b:{txt:"楽しくても言葉は控えめにする",ic:"🌙",k:"M"}},
+  {ax:"a3",t:"理想のデートは？",a:{txt:"サプライズや非日常にときめきたい",ic:"✨",k:"D"},b:{txt:"無理なく楽しめるのが一番",ic:"⚓",k:"R"}},
+  {ax:"a3",t:"恋に求めるのは？",a:{txt:"運命的なときめき",ic:"✨",k:"D"},b:{txt:"安心できる信頼関係",ic:"⚓",k:"R"}},
+  {ax:"a3",t:"相手を選ぶ基準は？",a:{txt:"ビビッとくる感覚",ic:"✨",k:"D"},b:{txt:"一緒にいて落ち着くか",ic:"⚓",k:"R"}},
+  {ax:"a3",t:"自分の恋愛観は？",a:{txt:"ロマンチストだと思う",ic:"✨",k:"D"},b:{txt:"現実的だと思う",ic:"⚓",k:"R"}},
+  {ax:"a3",t:"将来を考えるとき重視するのは？",a:{txt:"夢やときめき",ic:"✨",k:"D"},b:{txt:"生活の相性",ic:"⚓",k:"R"}},
+  {ax:"a3",t:"告白されるなら？",a:{txt:"ロマンチックな演出で",ic:"✨",k:"D"},b:{txt:"飾らない素直な言葉で",ic:"⚓",k:"R"}},
+  {ax:"a3",t:"好きになるきっかけは？",a:{txt:"一目惚れや雰囲気",ic:"✨",k:"D"},b:{txt:"性格や価値観を知ってから",ic:"⚓",k:"R"}},
+  {ax:"a4",t:"付き合ったら休日は？",a:{txt:"できるだけ一緒に過ごしたい",ic:"🤝",k:"T"},b:{txt:"一人の時間も大事にしたい",ic:"🗺️",k:"I"}},
+  {ax:"a4",t:"連絡の頻度は？",a:{txt:"こまめに取り合いたい",ic:"🤝",k:"T"},b:{txt:"必要なときで十分",ic:"🗺️",k:"I"}},
+  {ax:"a4",t:"相手との距離感は？",a:{txt:"いつも近くにいたい",ic:"🤝",k:"T"},b:{txt:"適度な距離が心地いい",ic:"🗺️",k:"I"}},
+  {ax:"a4",t:"趣味の時間は？",a:{txt:"できれば一緒に楽しみたい",ic:"🤝",k:"T"},b:{txt:"別々でも気にしない",ic:"🗺️",k:"I"}},
+  {ax:"a4",t:"理想の関係は？",a:{txt:"ベッタリ仲良し",ic:"🤝",k:"T"},b:{txt:"自立した大人な二人",ic:"🗺️",k:"I"}},
+  {ax:"a4",t:"ケンカしたあとは？",a:{txt:"すぐ会って話したい",ic:"🤝",k:"T"},b:{txt:"少し一人で頭を冷やしたい",ic:"🗺️",k:"I"}},
+  {ax:"a4",t:"記念日は？",a:{txt:"必ず一緒に盛大に祝いたい",ic:"🤝",k:"T"},b:{txt:"形にこだわらず自然体で",ic:"🗺️",k:"I"}}
+];
+
+const TYPES={
+ HSDT:{n:1,name:"いちずアタックペン",sp:"コウテイ",col:"#6E7486",cat:"まっすぐで一途な愛情表現が得意！好きになったら一直線！",tags:["情熱的","一途","行動力"],
+  love:"好きになったら全力。気持ちを隠さずまっすぐ伝え、行動で示す情熱家です。距離をぐいぐい詰めていくので相手にも想いが届きやすい一方、自分のテンポで突っ走り、相手を置いていってしまうことも。恋人にはとことん尽くし、いつも一緒にいたいロマンチストな一面も持っています。",
+  good:"駆け引き抜きのまっすぐな愛情で、相手を安心させられる。",weak:"一途さがときに“重さ”に変わることも。相手のペースを見る余裕を。",
+  best:"WSDI",bestReason:"あなたの全力アプローチを素直に受け止めて甘えてくれる相手。押す側と受ける側がきれいに噛み合う相性です。",
+  tough:"HMRI",toughReason:"距離を詰めたいあなたと、一人の時間を大切にしたい相手。ペースがぶつかりやすいので言葉での確認を。",
+  advice:"たまには相手のペースに合わせて“待つ”勇気も、愛情のひとつです。"},
+ HSDI:{n:2,name:"うきうき探検ペン",sp:"イワトビ",col:"#B5906B",cat:"好奇心旺盛でじっとしていられない！新しい世界が大好きな冒険家。",tags:["明るい","好奇心","自由"],
+  love:"好奇心のままに動く、恋も冒険のひとつと捉えるタイプ。明るくフレンドリーで、自然と距離を縮めるのが得意です。ときめきや刺激を大切にする一方、束縛や重い空気は苦手。お互いの自由を尊重し合える相手とは、どこまでも一緒に楽しい時間を重ねていけます。",
+  good:"一緒にいて飽きさせない、その場を明るくする太陽のような存在。",weak:"楽しさ優先で“好き”の言葉が後回しに。節目では本気を言葉に。",
+  best:"WMDI",bestReason:"お互いの世界とペースを尊重し合える相手。自由な二人旅のような心地よい関係に。",
+  tough:"WSRT",toughReason:"刺激を求めるあなたと、安定を求める相手。理想のテンポがすれ違いやすいので歩み寄りを。",
+  advice:"楽しさの中に“ちゃんと好き”を残すと、相手はもっと安心してくれます。"},
+ HSRT:{n:3,name:"献身ペン",sp:"ジェンツー",col:"#8FB0A8",cat:"相手の幸せを一番に願うやさしい子。支えることに喜びを感じるよ。",tags:["献身的","気配り","誠実"],
+  love:"相手の喜ぶ顔が何よりの原動力の世話焼き。さりげない気遣いやプレゼントで愛を示し、関係を現実的にコツコツ大切に育てます。いつも近くで支えていたいタイプですが、尽くしすぎて自分を後回しにしてしまうことも。見返りを求めず動ける優しさが最大の武器です。",
+  good:"細やかな気配りで、相手の生活ごと幸せにできる包容力。",weak:"尽くしすぎて疲れたり、重く感じられることも。甘えるのも大事。",
+  best:"WMDT",bestReason:"あなたの優しさを心から喜び、少しずつ心を開いてくれる相手。育てる恋にぴったりです。",
+  tough:"HMRI",toughReason:"近くで尽くしたいあなたと、放っておいてほしい相手。温度差が出やすいので距離感のすり合わせを。",
+  advice:"「してあげる」だけでなく、ときには甘えることが関係を深めるコツです。"},
+ HSRI:{n:4,name:"モテペン",sp:"マカロニ",col:"#C9A86B",cat:"魅力たっぷりでみんなの人気者！自然と人を惹きつけちゃう天才。",tags:["魅力的","社交的","駆け引き上手"],
+  love:"自分の魅せ方を熟知した恋の演出家。社交的で駆け引きが上手く、相手をドキドキさせるのが得意です。現実的に相手を見極めつつ、本命の前では意外と一途な一面も。自立していて、対等に楽しめる刺激的な関係を好みます。",
+  good:"その場を華やかにし、相手の心を自在につかむ魅力とセンス。",weak:"駆け引きが過ぎると本心が伝わらないことも。本命には素直に。",
+  best:"HMRI",bestReason:"簡単になびかない相手だからこそ燃える、刺激的でスリリングな相性です。",
+  tough:"WMDT",toughReason:"駆け引きの多さが奥手な相手を不安にさせがち。本命には“まっすぐな安心”を。",
+  advice:"本命には“素のあなた”を見せると、一気に距離が縮まります。"},
+ HMDT:{n:5,name:"ツンデレペン",sp:"ヒゲ",col:"#7C8597",cat:"素直になれないけど本当は甘えんぼ。照れながらも想いは本物だよ。",tags:["クール","一途","ギャップ"],
+  love:"普段はクールで素っ気ないのに、好きな人の前ではつい甘えが出てしまうギャップの持ち主。自分から動くものの、気持ちは隠しがちです。本当はロマンチストで、恋人とはべったり一緒にいたい甘えん坊。心を許した相手にだけ見せる顔が最大の魅力になります。",
+  good:"ツンとデレの落差で、相手を強く惹きつけるギャップ力。",weak:"素直になれず誤解を生みやすい。好きは言葉でも伝えて。",
+  best:"WSRT",bestReason:"あなたの不器用な甘えを丸ごと受け止めてくれる相手。安心して素を出せます。",
+  tough:"HMRI",toughReason:"お互い本音を隠しがちで、距離が縮まらないまま終わりやすい二人。",
+  advice:"素直な“好き”をたまに言葉にするだけで、誤解はぐっと減ります。"},
+ HMDI:{n:6,name:"ミステリーペン",sp:"マユダチ",col:"#8E84A0",cat:"何を考えてるかわからないミステリアスな子。知れば知るほどハマっちゃうかも？",tags:["神秘的","情熱的","一匹狼"],
+  love:"何を考えているか読めない神秘的な魅力の持ち主。内側に熱い情熱を秘め、狙った相手にはミステリアスに迫ります。一匹狼で自分の世界を大切にし、心を開くまで時間がかかる分、開いた相手だけに見せる素顔のギャップが強烈にかわいいタイプです。",
+  good:"底の見えないミステリアスさで、相手を夢中にさせる引力。",weak:"秘密主義が壁になりがち。少しずつ内面を見せると関係が動く。",
+  best:"WSDT",bestReason:"ドラマチックな恋を夢見る相手と、神秘的なあなた。物語のように惹かれ合えます。",
+  tough:"WMRI",toughReason:"お互い踏み込まなさすぎて、関係が進展しにくい二人。",
+  advice:"心を開くまで時間がかかる分、開いた相手はずっと大切に。"},
+ HMRT:{n:7,name:"てれかくしペン",sp:"アデリー",col:"#8A8C96",cat:"照れるとつい隠しちゃうシャイタイプ。本当はわかってほしい気持ちでいっぱい。",tags:["誠実","ピュア","努力家"],
+  love:"好きなのに素直になれず、つい逆のことを言ってしまう不器用な照れ屋さん。でも行動は誠実そのもので、現実的に相手を大切にします。本当はそばにいたい甘えん坊なのに、照れ隠しでツンとしてしまう——そのギャップがたまらなく愛おしいタイプです。",
+  good:"言葉は不器用でも、行動で示す確かな誠実さ。",weak:"天邪鬼な言動が本心を隠してしまう。素直さをひと匙。",
+  best:"WSRI",bestReason:"あなたの不器用さを焦らず受け止めてくれる相手。肩の力が抜けて自然体でいられます。",
+  tough:"HMDI",toughReason:"お互い本音を見せず、すれ違ったまま距離が縮まりにくい二人。",
+  advice:"照れ隠しの一言の前に、本音をひとつ添えるとちゃんと伝わります。"},
+ HMRI:{n:8,name:"一匹狼ペン",sp:"フィヨルドランド",col:"#7E9BB8",cat:"自分のルールを大切にする一匹狼。群れよりも自由が好きなクールさん。",tags:["自立","行動力","クール"],
+  love:"群れを好まない孤高のハンター。狙った相手にはクールにアプローチしますが、ベタベタは苦手で、自立した対等な関係を好みます。感情を表に出さず現実的。けれど心を許すと一転、不器用に相手を大切にする一面が強いギャップの魅力になります。",
+  good:"自立したミステリアスな佇まいと、いざという時の行動力。",weak:"クールすぎて気持ちが伝わらないことも。弱さを見せる勇気を。",
+  best:"HSRI",bestReason:"手強い相手にこそ燃えるあなたと、魅せ上手な相手。スリリングに惹かれ合う相性です。",
+  tough:"HSDT",toughReason:"全力で迫られるとつい引いてしまいがち。距離感の調整が鍵に。",
+  advice:"たまに弱さを見せると、“近づける人”になれます。"},
+ WSDT:{n:9,name:"ロマンペン",sp:"オウサマ",col:"#9AAEC4",cat:"夢や理想を大切にするロマンチスト。いつも心は遠い星を見てる。",tags:["ロマンチスト","上品","一途"],
+  love:"ドラマチックな恋に憧れる上品なロマンチスト。自分から動くより、運命的な出会いを待つタイプです。好意は素直に示し、一度好きになると深く尽くします。恋人とはいつも寄り添っていたく、理想のラブストーリーを大切に育てていきます。",
+  good:"一途で献身的、ロマンを大切にする深く優しい愛情。",weak:"待ちすぎてチャンスを逃しがち。小さなサインを自分から。",
+  best:"HSDT",bestReason:"運命を待つあなたを、まっすぐ全力で迎えにきてくれる相手。理想の物語が叶います。",
+  tough:"WMRI",toughReason:"お互い受け身で距離を取りがちなため、関係が動き出しにくい二人。",
+  advice:"待つだけでなく、小さなサインを出すと運命の方から動きだします。"},
+ WSDI:{n:10,name:"ふわっと甘えペン",sp:"フンボルト",col:"#C39AA0",cat:"ふわふわ癒し系の甘えんぼ。好きな人の前ではとことん甘えたい。",tags:["甘え上手","素直","愛されオーラ"],
+  love:"自然と相手の懐に入っていく甘え上手なタイプ。素直で愛されオーラがあり、受け身ながら好きな人にはふわっと寄り添います。自分の時間も大切にする一方、心を許した相手には全力で甘える——一緒にいるだけで癒される、みんなに好かれる存在です。",
+  good:"素直な甘え方で相手の保護欲をくすぐる愛されキャラ。",weak:"受け身すぎて相手任せに。たまには自分から一歩を。",
+  best:"HSDT",bestReason:"ぐいぐい引っ張ってくれる相手に、あなたが素直に甘えられる。安定感抜群の名コンビです。",
+  tough:"WMRI",toughReason:"お互い受け身で甘えたいタイプ同士。リードする人がいないと停滞しがち。",
+  advice:"甘えるだけでなく、ときには相手を甘えさせると絆が深まります。"},
+ WSRT:{n:11,name:"ぽかぽかおうちペン",sp:"ケープ",col:"#C2998E",cat:"おうち時間とぬくもりが大好き。安心できる場所がいちばんの幸せ。",tags:["家庭的","思いやり","安定"],
+  love:"ぬくもりのある関係をコツコツ育てていく家庭派。派手さよりも「一緒にいて落ち着く」を大切にし、愛情は素直に示します。受け身だけれど芯はあたたかく、相手を包み込む安心感が魅力。長く続く、穏やかであたたかな恋を理想としています。",
+  good:"一緒にいてホッとできる、家庭的なあたたかさと安定感。",weak:"安定を求めるあまりマンネリに。小さな刺激も時々。",
+  best:"HMDT",bestReason:"クールに見えて甘えたがりな相手を、あなたが丸ごと受け止める。安心と甘えが噛み合います。",
+  tough:"HSDI",toughReason:"落ち着きたいあなたと刺激を求める相手。テンポがすれ違いやすいので理想の共有を。",
+  advice:"当たり前にせず“好き”を言葉にすると、あたたかい関係が長続きします。"},
+ WSRI:{n:12,name:"ゆるっと本命ペン",sp:"マゼラン",col:"#A6B58C",cat:"本命にはとことん一途でまっすぐ。特別な存在を大切にするよ。",tags:["マイペース","現実的","安定"],
+  love:"ガツガツせず、自然体で恋を育てるマイペースな現実派。無理のない距離感で、長く続く穏やかな関係を作るのが得意です。素直だけれど受け身で、本命にはのんびり一途。お互いの自由を尊重しながら、地に足のついた愛をゆっくり育んでいきます。",
+  good:"飾らない自然体で、相手を安心させる肩の力の抜けた安定感。",weak:"のんびりしすぎて気持ちが伝わりにくいことも。サインは時々はっきり。",
+  best:"HMRT",bestReason:"不器用な相手を焦らず包めるあなたと、照れ屋な相手。無理なく心地よい相性です。",
+  tough:"HSDT",toughReason:"全力で来られるとペースを乱されがち。歩調を合わせられるかが鍵に。",
+  advice:"ゆっくりでも、“気持ちのサイン”は時々わかりやすく出してあげて。"},
+ WMDT:{n:13,name:"妖精ペン",sp:"コガタ",col:"#92A0C4",cat:"小さな幸せを見つけるのが得意な妖精。魔法みたいに周りを癒してくれるよ。",tags:["一途","癒し系","ピュア"],
+  love:"小さな勇気を積み重ねる奥手なタイプ。シャイで気持ちを隠しがちだけれど、想いは一途でとても深いです。夢見がちでロマンを大切にし、好きな人のそばにいるだけで幸せを感じます。心を開いた相手だけに見せる素顔は、妖精のように愛らしい魅力にあふれています。",
+  good:"控えめだけど一途で純粋、そばにいる人を癒す存在。",weak:"奥手すぎて気持ちを伝えられないことも。小さな一歩を大切に。",
+  best:"HSRT",bestReason:"優しくリードして尽くしてくれる相手に、あなたが安心して心を開ける理想の形です。",
+  tough:"HSRI",toughReason:"駆け引き上手な相手に振り回され、不安になりがち。まっすぐな相手が向いています。",
+  advice:"勇気を出した小さな一歩が、相手の心を大きく動かします。"},
+ WMDI:{n:14,name:"マイペースペン",sp:"ガラパゴス",col:"#A89E94",cat:"自分のペースを何より大切にするタイプ。のんびりだけど芯はしっかりしてるよ。",tags:["独創的","マイペース","一途"],
+  love:"独自の世界観を持つマイペースな夢想家。恋にも自分のリズムがあり、それを尊重してくれる相手と深く繋がれます。気持ちは表に出さず受け身ですが、内面はロマンチスト。一人の時間と空想を大切にし、心を許した相手だけを自分の世界へそっと招き入れます。",
+  good:"唯一無二の世界観で、相手を惹きつける独創的な魅力。",weak:"マイペースさが伝わりにくく誤解されがち。気持ちは言葉に。",
+  best:"HSDI",bestReason:"自由を尊重し合えて、お互いの世界を面白がれる相手。相性抜群の二人旅になります。",
+  tough:"HSRT",toughReason:"距離を詰めて尽くしたい相手に、あなたが窮屈さを感じやすい二人です。",
+  advice:"自分の世界に相手を“招く”と、距離はぐっと縮まります。"},
+ WMRT:{n:15,name:"じっくり本気ペン",sp:"スネアーズ",col:"#C4B48E",cat:"一つのことにじっくり向き合う努力家。本気になると誰よりもまっすぐ！",tags:["慎重","堅実","一途"],
+  love:"石橋を叩いて渡る慎重な堅実派。軽い恋は苦手で、本気だと決めたら一直線に進みます。気持ちは表に出さず時間をかけますが、信頼を積み上げた愛は決して揺るぎません。恋人とは安心できる近い距離で、長く深い関係を築いていきたいタイプです。",
+  good:"慎重さの裏にある、本気の覚悟と揺るがない誠実さ。",weak:"慎重すぎて進展が遅くなりがち。たまにストレートな一歩を。",
+  best:"WSDT",bestReason:"焦らず深い絆を育てたい二人。時間をかけて結ばれる本命同士の相性です。",
+  tough:"HSDI",toughReason:"軽やかに動く相手に、慎重なあなたが振り回されやすい二人。",
+  advice:"慎重さの中に、たまの“ストレートな一言”を添えて前進を。"},
+ WMRI:{n:16,name:"凛々クールペン",sp:"キガシラ",col:"#A892A8",cat:"凛とした雰囲気で、芯が強いクールタイプ。自立心が高くて頼れる存在。",tags:["自立","クール","知的"],
+  love:"凛として自立したクールビューティ。べたべたした関係より、お互いを尊重し合える大人の関係を好みます。気持ちは表に出さず受け身ですが、現実的で芯が強いタイプ。心を許した相手にだけ見せる優しさと、普段の自立した佇まいのギャップがじわじわ効いてきます。",
+  good:"自立した知的な佇まいと、信頼した相手にだけ向ける深い情。",weak:"クールで受け身すぎて距離が縮まらないことも。心の扉を少し。",
+  best:"HSRI",bestReason:"魅せ上手で引っ張ってくれる相手に、あなたのクールが少しずつほどける好相性です。",
+  tough:"WSDI",toughReason:"お互い受け身で甘えたいタイプ同士。踏み込む人がいないと進みにくい二人です。",
+  advice:"自分の時間を大切にしつつ、相手にも心の扉を少しだけ開いてみて。"}
+};
+const CODES=Object.keys(TYPES).sort((a,b)=>TYPES[a].n-TYPES[b].n);
+
+/* ====== ペンギン画像（無ければSVGに自動フォールバック） ====== */
+function svgHTML(col,w){ const h=Math.round(w*130/120); return `<svg viewBox="0 0 120 130" width="${w}" height="${h}" style="--down:${col}"><use href="#peng"/></svg>`; }
+function pengErr(img,col){ const s=document.createElement('span'); s.innerHTML=svgHTML(col,img.getAttribute('width')||74); img.replaceWith(s.firstElementChild); }
+function pengHTML(n,col,w){ return `<img width="${w}" src="img/${n}.png" alt="" onerror="pengErr(this,'${col}')">`; }
+function setPeng(el,n,col,w){ el.innerHTML=pengHTML(n,col,w); }
+
+const $=id=>document.getElementById(id);
+function show(s){ document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active')); $(s).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
+function goSection(id){ show('screen-start'); setTimeout(()=>{ if(id==='top'){window.scrollTo({top:0,behavior:'smooth'});return;} const el=document.getElementById(id); if(el) el.scrollIntoView({behavior:'smooth'}); },60); }
+window.goSection=goSection;
+
+/* landing build */
+function buildLanding(){
+  $('hero-peng').innerHTML=pengHTML(1,'#6E7486',150);
+  $('type-grid').innerHTML=CODES.map(c=>{const t=TYPES[c];
+    return `<div class="tcard" onclick="previewType('${c}')">
+      <div class="pc">${pengHTML(t.n,t.col,74)}</div>
+      <div class="nm">${t.n}. ${t.name}</div><div class="cd">${c}</div>
+      <div class="ct">${t.sp}ペンギン</div></div>`;}).join('');
+  $('compat-tbody').innerHTML=CODES.map(c=>{const t=TYPES[c],b=TYPES[t.best];
+    return `<tr><td class="c-name">${t.name}<br><span style="color:var(--ink-soft);font-size:11px">${c}</span></td>
+      <td>${b.name}<br><span style="color:var(--ink-soft);font-size:11px">${t.best}</span></td></tr>`;}).join('');
+}
+function previewType(code){ renderResult(code,null,true); }
+
+function startQuiz(){ idx=0; answers.fill(null); show('screen-quiz'); renderQuestion(); }
+let idx=0, answers=new Array(QUESTIONS.length).fill(null);
+function renderQuestion(){ const q=QUESTIONS[idx];
+  $('q-num').textContent=idx+1; $('q-axis').textContent=AXES[q.ax].name;
+  $('q-fill').style.width=((idx+1)/QUESTIONS.length*100)+'%'; $('q-text').textContent=q.t;
+  $('q-back').style.visibility=idx===0?'hidden':'visible';
+  const w=$('q-choices'); w.innerHTML='';
+  [['a',q.a],['b',q.b]].forEach(([k,o])=>{const b=document.createElement('button');b.className='choice';
+    b.innerHTML=`<span class="ic">${o.ic}</span><span>${o.txt}</span>`;b.onclick=()=>choose(k);w.appendChild(b);});
+}
+function choose(k){ answers[idx]=k; if(idx<QUESTIONS.length-1){idx++;renderQuestion();}else finish(); }
+function prevQuestion(){ if(idx>0){idx--;renderQuestion();} }
+function finish(){ const s={H:0,W:0,S:0,M:0,D:0,R:0,T:0,I:0};
+  QUESTIONS.forEach((q,i)=>{const o=answers[i]==='a'?q.a:q.b;s[o.k]++;});
+  const code=(s.H>=s.W?'H':'W')+(s.S>=s.M?'S':'M')+(s.D>=s.R?'D':'R')+(s.T>=s.I?'T':'I');
+  renderResult(code,s,false);
+}
+const pct=n=>Math.round(n/PER_AXIS*100);
+function renderResult(code,score,preview){
+  const t=TYPES[code];
+  setPeng($('r-peng'),t.n,t.col,170);
+  $('r-name').textContent=t.n+'. '+t.name; $('r-species').textContent=t.sp+'ペンギン';
+  $('r-code').textContent=code; $('r-code-expand').textContent=code.split('').map(k=>KEYTXT[k]).join(' × ');
+  $('r-cat').textContent=t.cat; $('r-tags').innerHTML=t.tags.map(x=>`<span class="tag"># ${x}</span>`).join('');
+  $('r-desc').textContent=t.love; $('r-good').textContent=t.good; $('r-weak').textContent=t.weak;
+  const order=['a1','a2','a3','a4'];
+  $('r-axes').innerHTML=order.map((ax,i)=>{const A=AXES[ax];
+    const sc = score ? score : null;
+    const leftPct = sc ? pct(sc[A.L]) : (code[i]===A.L?100:0);
+    const chosen=code[i], cl=chosen===A.L, cpct= sc ? pct(sc[chosen]) : 100;
+    return `<div class="axis"><div class="ax-row">
+      <span class="ax-pole ${cl?'on':''}">${A.Ltxt}<small>${A.L}</small></span>
+      <span class="ax-bar"><i style="width:${leftPct}%"></i></span>
+      <span class="ax-pole right ${cl?'':'on'}">${A.Rtxt}<small>${A.R}</small></span></div>
+      <p class="ax-cap">${A.name} — あなたは <b>「${cl?A.Ltxt:A.Rtxt}」</b>寄り${sc?'（'+cpct+'%）':''}</p></div>`;
+  }).join('');
+  const b=TYPES[t.best]; setPeng($('r-best-peng'),b.n,b.col,58);
+  $('r-best-name').textContent=b.name; $('r-best-sp').textContent=b.sp+'ペンギン'; $('r-best-reason').textContent=t.bestReason;
+  const g=TYPES[t.tough]; setPeng($('r-tough-peng'),g.n,g.col,58);
+  $('r-tough-name').textContent=g.name; $('r-tough-sp').textContent=g.sp+'ペンギン'; $('r-tough-reason').textContent=t.toughReason;
+  $('r-advice').textContent=t.advice;
+  window._code=code; show('screen-result');
+}
+function restart(){ show('screen-start'); }
+
+/* share */
+function shareText(){ const t=TYPES[window._code]; return `私の恋愛タイプは「${t.name}（${t.sp}ペンギン・${window._code}）」でした🐧\n${t.cat}\n#恋するペンギン診断`; }
+function shareX(){ open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText())}&url=${encodeURIComponent(SITE_URL)}`,'_blank'); }
+function shareLine(){ open(`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(SITE_URL)}&text=${encodeURIComponent(shareText())}`,'_blank'); }
+function copyLink(){ navigator.clipboard.writeText(shareText()+'\n'+SITE_URL).then(()=>toast('結果とリンクをコピーしました！'),()=>toast('コピーできませんでした')); }
+let tt; function toast(m){const e=$('toast');e.textContent=m;e.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('show'),1900);}
+
+buildLanding();
+</script>
+</body>
+</html>
